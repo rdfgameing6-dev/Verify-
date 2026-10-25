@@ -132,6 +132,37 @@ body {
     }
 }
 
+/* Centre logo state colours: red on error, green on success. */
+.logo-area.failed .energy-ring {
+    border-color: #ff3048;
+    box-shadow: 0 0 16px #ff3048, inset 0 0 18px #ff304835;
+}
+.logo-area.failed .energy-ring::before {
+    border-color: #ff9aa590;
+}
+.logo-area.failed .energy-ring::after {
+    border-color: #ff304890;
+    box-shadow: 0 0 14px #ff304860;
+}
+.logo-area.failed .scan-beam {
+    background: #ffe0e3;
+    box-shadow: 0 0 8px #ff3048, 0 0 22px #ff3048, 0 0 42px #ff3048;
+}
+.logo-area.success .energy-ring {
+    border-color: #19d98b;
+    box-shadow: 0 0 16px #19d98b, inset 0 0 18px #19d98b35;
+}
+.logo-area.success .energy-ring::before {
+    border-color: #9bffd590;
+}
+.logo-area.success .energy-ring::after {
+    border-color: #19d98b90;
+    box-shadow: 0 0 14px #19d98b60;
+}
+.logo-area.success .logo {
+    filter: drop-shadow(0 0 14px #19d98b70);
+}
+
 .logo {
     position: relative;
     z-index: 2;
@@ -269,40 +300,21 @@ body {
     overflow: visible;
 }
 
-/* JET APPROACHES, SCANS, AND DEPARTS */
-
-.fighter.run {
-    animation: fighterJourney 13s ease-in-out forwards;
+/* JET APPROACHES, SCANS, AND DEPARTS — animate transform for smoother mobile performance */
+.fighter {
+    top: 36%;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
 }
-
+.fighter.run {
+    animation: fighterJourney 13s cubic-bezier(.22,.61,.36,1) forwards;
+}
 @keyframes fighterJourney {
-    0% {
-        top: 110%;
-        opacity: 0;
-        transform: translateX(-50%) scale(.65);
-    }
-
-    12% {
-        opacity: 1;
-    }
-
-    22% {
-        top: 36%;
-        opacity: 1;
-        transform: translateX(-50%) scale(1);
-    }
-
-    83% {
-        top: 36%;
-        opacity: 1;
-        transform: translateX(-50%) scale(1);
-    }
-
-    100% {
-        top: -25%;
-        opacity: 0;
-        transform: translateX(-50%) scale(.65);
-    }
+    0%   { opacity: 0; transform: translate3d(-50%, 150vh, 0) scale(.65); }
+    12%  { opacity: 1; }
+    22%  { opacity: 1; transform: translate3d(-50%, 0, 0) scale(1); }
+    83%  { opacity: 1; transform: translate3d(-50%, 0, 0) scale(1); }
+    100% { opacity: 0; transform: translate3d(-50%, -150vh, 0) scale(.65); }
 }
 
 /* SCAN COMPLETED TEXT */
@@ -371,6 +383,33 @@ body {
     font-size: 11px;
     letter-spacing: 2px;
     text-align: center;
+}
+
+/* Minimal verification indicator; Turnstile's own UI appears only if interaction is required. */
+.turnstile-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 30;
+    min-height: 54px;
+    margin: 14px auto 0;
+}
+.verify-spinner {
+    width: 34px;
+    height: 34px;
+    border: 3px solid #1b4566;
+    border-top-color: #35eaff;
+    border-right-color: #35eaff;
+    border-radius: 50%;
+    animation: verifySpin .8s linear infinite;
+    filter: drop-shadow(0 0 7px #00cfff80);
+}
+@keyframes verifySpin {
+    to { transform: rotate(360deg); }
+}
+.turnstile-wrap.complete .verify-spinner {
+    display: none;
 }
 
 /* STATUS INDICATOR */
@@ -548,27 +587,10 @@ body {
     }
 
     @keyframes fighterJourneySmall {
-        0% {
-            top: 110%;
-            opacity: 0;
-            transform: translateX(-50%) scale(.65);
-        }
-
-        12% {
-            opacity: 1;
-        }
-
-        22%, 83% {
-            top: 30%;
-            opacity: 1;
-            transform: translateX(-50%) scale(.85);
-        }
-
-        100% {
-            top: -25%;
-            opacity: 0;
-            transform: translateX(-50%) scale(.65);
-        }
+        0% { opacity: 0; transform: translate3d(-50%, 150vh, 0) scale(.6); }
+        12% { opacity: 1; }
+        22%, 83% { opacity: 1; transform: translate3d(-50%, 0, 0) scale(.85); }
+        100% { opacity: 0; transform: translate3d(-50%, -150vh, 0) scale(.6); }
     }
 
     .status-box {
@@ -663,7 +685,7 @@ body {
                   fill="url(#jetFlame)">
                 <animate attributeName="opacity"
                          values="1;.5;1"
-                         dur=".25s"
+                         dur=".6s"
                          repeatCount="indefinite"/>
             </path>
 
@@ -724,14 +746,14 @@ body {
             <circle cx="18" cy="72" r="2.5" fill="#ffffff">
                 <animate attributeName="opacity"
                          values="1;.2;1"
-                         dur=".5s"
+                         dur=".8s"
                          repeatCount="indefinite"/>
             </circle>
 
             <circle cx="102" cy="72" r="2.5" fill="#ffffff">
                 <animate attributeName="opacity"
                          values=".2;1;.2"
-                         dur=".5s"
+                         dur=".8s"
                          repeatCount="indefinite"/>
             </circle>
 
@@ -742,7 +764,7 @@ body {
     <!-- NO VERTICAL LASER ELEMENT -->
 
     <div class="verified" id="verified">
-        ✦ LOGO SCANNED ✦
+        ✦ VERIFY USER ✦
     </div>
 
     <!-- BLUE STATUS TEXT -->
@@ -755,9 +777,16 @@ body {
             ADVANCED FIGHTER SCANNER
         </div>
 
-        <div id="turnstileWrap" style="display:flex;justify-content:center;margin:14px auto 0;min-height:65px;position:relative;z-index:30;">
-            <!-- Replace YOUR_CLOUDFLARE_SITE_KEY with the public Site Key from Cloudflare Turnstile. -->
-            <div class="cf-turnstile" data-sitekey="0x4AAAAAAFk4Exgng2h4rzkK" data-callback="onTurnstileSuccess" data-expired-callback="onTurnstileExpired" data-error-callback="onTurnstileError" data-theme="dark"></div>
+        <div id="turnstileWrap" class="turnstile-wrap">
+            <!-- Spinner is the normal view. Cloudflare's interactive challenge may appear if required. -->
+            <div id="verifySpinner" class="verify-spinner" role="status" aria-label="Verification in progress"></div>
+            <div class="cf-turnstile"
+                 data-sitekey="0x4AAAAAAFk4Exgng2h4rzkK"
+                 data-callback="onTurnstileSuccess"
+                 data-expired-callback="onTurnstileExpired"
+                 data-error-callback="onTurnstileError"
+                 data-appearance="interaction-only"
+                 data-theme="dark"></div>
         </div>
 
         <div class="status-indicator" id="statusIndicator">
@@ -775,8 +804,6 @@ body {
             class="start-btn"
             id="startBot"
             href="https://t.me/YOUR_BOT_USERNAME"
-            target="_blank"
-            rel="noopener noreferrer"
         >
             <span class="btn-icon">▶</span>
             <span>START BOT</span>
@@ -802,10 +829,16 @@ const startWrap = document.querySelector(".start-wrap");
   https://challenges.cloudflare.com/turnstile/v0/siteverify
   and enforces one-time verification server-side.
 */
-const VERIFY_API_URL = "https://YOUR-RENDER-SERVICE.onrender.com/verify-turnstile";
+const VERIFY_API_URL = "https://YOUR_DOMAIN/verify-turnstile";
 const BOT_USERNAME = "YOUR_BOT_USERNAME";
 const startBot = document.getElementById("startBot");
 startBot.href = "https://t.me/" + BOT_USERNAME;
+startBot.addEventListener("click", function(event) {
+    if (!BOT_USERNAME || BOT_USERNAME === "YOUR_BOT_USERNAME") {
+        event.preventDefault();
+        setStatus("VERIFICATION SUCCESSFUL", "SET YOUR TELEGRAM BOT USERNAME IN THE HTML", "success");
+    }
+});
 let turnstileToken = null;
 let verificationInProgress = false;
 
@@ -813,12 +846,21 @@ function setStatus(text, subtitle, state = "") {
     statusText.textContent = text;
     statusSubtitle.textContent = subtitle;
     statusIndicator.classList.remove("failed", "success");
-    if (state) statusIndicator.classList.add(state);
+    logoArea.classList.remove("failed", "success");
+    if (state) {
+        statusIndicator.classList.add(state);
+        if (state === "failed" || state === "success") logoArea.classList.add(state);
+    }
 }
 
 function showFailure(message = "VERIFICATION FAILED") {
+    // Stop the scan immediately and mark the centre logo red.
+    logoArea.classList.remove("scanning");
+    fighter.classList.remove("run");
     startWrap.classList.remove("visible");
     verified.classList.remove("show");
+    document.getElementById("turnstileWrap").style.display = "flex";
+    document.getElementById("turnstileWrap").classList.remove("complete");
     setStatus(message, "PLEASE TRY AGAIN OR CONTACT SUPPORT", "failed");
 }
 
@@ -842,11 +884,12 @@ window.onTurnstileSuccess = async function(token) {
         if (!response.ok) throw new Error("Verification server error");
         const result = await response.json();
         if (result && result.verified === true && result.one_time === true) {
-            setStatus("VERIFICATION COMPLETE", "SERVER CONFIRMED · YOU CAN START THE BOT", "success");
+            setStatus("VERIFICATION SUCCESSFUL", "ALL CHECKS PASSED · TAP START BOT BELOW", "success");
             verified.textContent = "✦ VERIFICATION COMPLETE ✦";
             verified.classList.remove("show");
             void verified.offsetWidth;
             verified.classList.add("show");
+            document.getElementById("turnstileWrap").classList.add("complete");
             document.getElementById("turnstileWrap").style.display = "none";
             startWrap.classList.add("visible");
         } else {
@@ -864,8 +907,7 @@ window.onTurnstileSuccess = async function(token) {
 
 window.onTurnstileExpired = function() {
     turnstileToken = null;
-    startWrap.classList.remove("visible");
-    setStatus("VERIFICATION EXPIRED", "PLEASE COMPLETE THE CHECK AGAIN", "failed");
+    showFailure("VERIFICATION EXPIRED");
 };
 window.onTurnstileError = function() {
     turnstileToken = null;
@@ -894,10 +936,10 @@ function startScan() {
     timers.forEach(clearTimeout);
     timers = [];
     fighter.classList.remove("run");
-    logoArea.classList.remove("scanning");
+    logoArea.classList.remove("scanning", "failed", "success");
     verified.classList.remove("show");
     startWrap.classList.remove("visible");
-    setStatus("FIGHTER JET APPROACHING", "ENTERING FROM BELOW");
+    setStatus("FIGHTER JET APPROACHING", "SECURITY CHECK IN PROGRESS");
 
     void fighter.offsetWidth;
     fighter.classList.add("run");
