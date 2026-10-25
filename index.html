@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#030817">
+
+<title>SHIV KE BOTZ - Fighter Scanner</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    color: white;
+    background: #020611;
+}
+
+.scene {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background:
+        radial-gradient(
+            ellipse at 50% 40%,
+            #102d4a 0%,
+            #07162d 48%,
+            #020611 100%
+        );
+}
+
+/* STARS */
+
+.stars {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    background: #e8fcff;
+    box-shadow: 0 0 7px #56dfff;
+    animation: twinkle 2s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+    from {
+        opacity: .2;
+        transform: scale(.7);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1.6);
+    }
+}
+
+/* LOGO */
+
+.logo-area {
+    position: absolute;
+    top: 36%;
+    left: 50%;
+    width: min(70vw, 310px);
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.energy-ring {
+    position: absolute;
+    inset: -10px;
+    border-radius: 50%;
+    border: 2px solid #35eaff;
+    box-shadow:
+        0 0 12px #00d9ff,
+        inset 0 0 15px #00d9ff35;
+    animation: ringPulse 2.5s ease-in-out infinite;
+}
+
+.energy-ring::before {
+    content: "";
+    position: absolute;
+    inset: 10px;
+    border-radius: 50%;
+    border: 1px dashed #9cefff90;
+    animation: rotateRing 14s linear infinite;
+}
+
+.energy-ring::after {
+    content: "";
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    border: 1px solid #b66cff90;
+    box-shadow: 0 0 12px #a64dff50;
+}
+
+@keyframes ringPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: .7;
+    }
+    50% {
+        transform: scale(1.035);
+        opacity: 1;
+    }
+}
+
+@keyframes rotateRing {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.logo {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+    filter: drop-shadow(0 0 12px #00c8ff45);
+}
+
+/* HORIZONTAL SCAN BEAM ONLY */
+
+.scan-beam {
+    position: absolute;
+    z-index: 4;
+    top: 0;
+    left: -10%;
+    width: 120%;
+    height: 3px;
+    opacity: 0;
+    pointer-events: none;
+    background: #d9ffff;
+    box-shadow:
+        0 0 8px #00f7ff,
+        0 0 22px #00d9ff,
+        0 0 42px #00aaff;
+}
+
+.scan-beam::after {
+    content: "";
+    position: absolute;
+    top: -30px;
+    left: 0;
+    right: 0;
+    height: 32px;
+    background: linear-gradient(
+        to top,
+        #00eaff35,
+        transparent
+    );
+}
+
+.logo-area.scanning .scan-beam {
+    animation: scanLogo 8s linear forwards;
+}
+
+@keyframes scanLogo {
+    0% {
+        top: 0;
+        opacity: 0;
+    }
+    5% {
+        opacity: 1;
+    }
+    95% {
+        opacity: 1;
+    }
+    100% {
+        top: 100%;
+        opacity: 0;
+    }
+}
+
+/* SCANNER CORNERS */
+
+.corner {
+    position: absolute;
+    width: 23px;
+    height: 23px;
+    z-index: 5;
+    border-color: #75f7ff;
+    border-style: solid;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.tl {
+    top: 7%;
+    left: 7%;
+    border-width: 2px 0 0 2px;
+}
+
+.tr {
+    top: 7%;
+    right: 7%;
+    border-width: 2px 2px 0 0;
+}
+
+.bl {
+    bottom: 7%;
+    left: 7%;
+    border-width: 0 0 2px 2px;
+}
+
+.br {
+    bottom: 7%;
+    right: 7%;
+    border-width: 0 2px 2px 0;
+}
+
+.logo-area.scanning .corner {
+    animation: cornerFlash 8s ease forwards;
+}
+
+@keyframes cornerFlash {
+    0%, 5% {
+        opacity: 0;
+    }
+    15%, 85% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+/* FIGHTER JET */
+
+.fighter {
+    position: absolute;
+    z-index: 10;
+    width: 100px;
+    height: 90px;
+    left: 50%;
+    top: 110%;
+    opacity: 0;
+    transform: translateX(-50%) scale(.65);
+    filter: drop-shadow(0 0 12px #00d9ff);
+    pointer-events: none;
+}
+
+.fighter svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+/* JET APPROACHES, SCANS, AND DEPARTS */
+
+.fighter.run {
+    animation: fighterJourney 13s ease-in-out forwards;
+}
+
+@keyframes fighterJourney {
+    0% {
+        top: 110%;
+        opacity: 0;
+        transform: translateX(-50%) scale(.65);
+    }
+
+    12% {
+        opacity: 1;
+    }
+
+    22% {
+        top: 36%;
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+    }
+
+    83% {
+        top: 36%;
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+    }
+
+    100% {
+        top: -25%;
+        opacity: 0;
+        transform: translateX(-50%) scale(.65);
+    }
+}
+
+/* SCAN COMPLETED TEXT */
+
+.verified {
+    position: absolute;
+    z-index: 15;
+    top: 7%;
+    left: 50%;
+    opacity: 0;
+    white-space: nowrap;
+    color: #28baff;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-shadow: 0 0 15px #008cff;
+    transform: translateX(-50%) scale(.5);
+    pointer-events: none;
+}
+
+.verified.show {
+    animation: verifiedPop 1.5s ease forwards;
+}
+
+@keyframes verifiedPop {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) scale(.5);
+    }
+
+    25%, 75% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) scale(1.1);
+    }
+}
+
+/* BLUE TEXT */
+
+.status-box {
+    position: absolute;
+    z-index: 12;
+    left: 0;
+    right: 0;
+    bottom: 20%;
+    width: 100%;
+    padding: 0 12px;
+    text-align: center;
+}
+
+.status-title {
+    color: #35bfff;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-shadow: 0 0 15px #008cff70;
+}
+
+.status-subtitle {
+    margin-top: 9px;
+    color: #42aaff;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-align: center;
+}
+
+/* STATUS INDICATOR */
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: fit-content;
+    max-width: 100%;
+    margin: 13px auto 0;
+    padding: 9px 14px;
+    border: 1px solid #167db9;
+    border-radius: 30px;
+    background: #071d38;
+    color: #39c7ff;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.status-dot {
+    flex-shrink: 0;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #00cfff;
+    box-shadow: 0 0 10px #00cfff;
+    animation: dotBlink 1s infinite alternate;
+}
+
+@keyframes dotBlink {
+    to {
+        opacity: .25;
+    }
+}
+
+/* Verification failure state */
+.status-indicator.failed {
+    border-color: #ff3b4f;
+    background: #300b16;
+    color: #ff5968;
+}
+.status-indicator.failed .status-dot {
+    background: #ff3048;
+    box-shadow: 0 0 10px #ff3048;
+}
+.status-indicator.success {
+    border-color: #19d98b;
+    background: #062a21;
+    color: #48ffc0;
+}
+.status-indicator.success .status-dot {
+    background: #19d98b;
+    box-shadow: 0 0 10px #19d98b;
+}
+
+/* START BOT BUTTON: hidden until the server confirms verification */
+.start-wrap {
+    position: absolute;
+    z-index: 20;
+    left: 0;
+    right: 0;
+
+    /* Move button upward from the bottom navigation area */
+    bottom: calc(5% + env(safe-area-inset-bottom));
+
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 22px;
+    text-align: center;
+    display: none;
+}
+.start-wrap.visible {
+    display: flex;
+}
+
+.start-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    width: min(100%, 330px);
+    min-height: 54px;
+
+    margin: 0 auto;
+
+    border: 1px solid #42cfff;
+    border-radius: 15px;
+
+    background: linear-gradient(
+        110deg,
+        #087cbd,
+        #1247a8,
+        #6126a9
+    );
+
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 900;
+    letter-spacing: 2px;
+
+    text-decoration: none;
+    text-align: center;
+
+    box-shadow:
+        0 0 15px #00c8ff45,
+        inset 0 0 12px #ffffff12;
+
+    overflow: hidden;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.start-btn:active {
+    transform: scale(.97);
+    box-shadow: 0 0 28px #00d9ff90;
+}
+
+.start-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        #ffffff35,
+        transparent
+    );
+    transform: skewX(-20deg);
+    animation: buttonShine 3s infinite;
+}
+
+@keyframes buttonShine {
+    0%, 55% {
+        left: -100%;
+    }
+    100% {
+        left: 150%;
+    }
+}
+
+.btn-icon {
+    width: 25px;
+    height: 25px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border: 1px solid #ffffff65;
+    border-radius: 50%;
+    font-size: 12px;
+}
+
+/* REMOVE EXTRA HELPER TEXT BELOW BUTTON */
+
+/* SMALL SCREEN */
+
+@media (max-height: 650px) {
+    .logo-area {
+        top: 30%;
+        width: min(47vw, 210px);
+    }
+
+    .fighter.run {
+        animation-name: fighterJourneySmall;
+    }
+
+    @keyframes fighterJourneySmall {
+        0% {
+            top: 110%;
+            opacity: 0;
+            transform: translateX(-50%) scale(.65);
+        }
+
+        12% {
+            opacity: 1;
+        }
+
+        22%, 83% {
+            top: 30%;
+            opacity: 1;
+            transform: translateX(-50%) scale(.85);
+        }
+
+        100% {
+            top: -25%;
+            opacity: 0;
+            transform: translateX(-50%) scale(.65);
+        }
+    }
+
+    .status-box {
+        bottom: 20%;
+    }
+
+    .status-title {
+        font-size: 18px;
+    }
+
+    .status-subtitle {
+        font-size: 9px;
+        margin-top: 6px;
+    }
+
+    .status-indicator {
+        margin-top: 8px;
+        padding: 7px 10px;
+        font-size: 10px;
+    }
+
+    .start-wrap {
+        bottom: calc(5% + env(safe-area-inset-bottom));
+    }
+
+    .start-btn {
+        min-height: 48px;
+        font-size: 13px;
+    }
+}
+</style>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+
+<body>
+
+<main class="scene">
+
+    <div class="stars" id="stars"></div>
+
+    <!-- CENTRE LOGO -->
+
+    <div class="logo-area" id="logoArea">
+
+        <div class="energy-ring"></div>
+
+        <img
+            src="https://i.ibb.co/d0GQ8j0S/IMG-20261021-211406-993.jpg"
+            alt="SHIV KE BOTZ Logo"
+            class="logo"
+        >
+
+        <div class="scan-beam"></div>
+
+        <div class="corner tl"></div>
+        <div class="corner tr"></div>
+        <div class="corner bl"></div>
+        <div class="corner br"></div>
+
+    </div>
+
+    <!-- FIGHTER JET -->
+
+    <div class="fighter" id="fighter">
+
+        <svg viewBox="0 0 120 100"
+             xmlns="http://www.w3.org/2000/svg">
+
+            <defs>
+                <linearGradient id="jetBody" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#f4ffff"/>
+                    <stop offset="35%" stop-color="#8ceeff"/>
+                    <stop offset="70%" stop-color="#2689dd"/>
+                    <stop offset="100%" stop-color="#092e70"/>
+                </linearGradient>
+
+                <linearGradient id="jetWing" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#a9f7ff"/>
+                    <stop offset="100%" stop-color="#1252a8"/>
+                </linearGradient>
+
+                <linearGradient id="jetFlame" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#ffffff"/>
+                    <stop offset="40%" stop-color="#42efff"/>
+                    <stop offset="100%" stop-color="#1684ff" stop-opacity="0"/>
+                </linearGradient>
+            </defs>
+
+            <!-- ENGINE FLAME -->
+
+            <path d="M48 69 L42 91 L54 79 L60 98 L66 79 L78 91 L72 69 Z"
+                  fill="url(#jetFlame)">
+                <animate attributeName="opacity"
+                         values="1;.5;1"
+                         dur=".25s"
+                         repeatCount="indefinite"/>
+            </path>
+
+            <!-- WINGS -->
+
+            <path d="M48 48 L4 78 L34 74 L57 61 Z"
+                  fill="url(#jetWing)"
+                  stroke="#b9faff"
+                  stroke-width="1.5"/>
+
+            <path d="M72 48 L116 78 L86 74 L63 61 Z"
+                  fill="url(#jetWing)"
+                  stroke="#b9faff"
+                  stroke-width="1.5"/>
+
+            <!-- TAIL FINS -->
+
+            <path d="M46 68 L29 87 L46 80 Z"
+                  fill="#1671c9"
+                  stroke="#86f7ff"
+                  stroke-width="1.5"/>
+
+            <path d="M74 68 L91 87 L74 80 Z"
+                  fill="#1671c9"
+                  stroke="#86f7ff"
+                  stroke-width="1.5"/>
+
+            <!-- JET BODY -->
+
+            <path d="M60 3 L69 23 L76 49 L72 69 L60 78 L48 69 L44 49 L51 23 Z"
+                  fill="url(#jetBody)"
+                  stroke="#ffffff"
+                  stroke-width="1.8"/>
+
+            <!-- COCKPIT -->
+
+            <path d="M60 15 L67 29 L65 40 L60 44 L55 40 L53 29 Z"
+                  fill="#052343"
+                  stroke="#8ef8ff"
+                  stroke-width="1.5"/>
+
+            <path d="M60 18 L64 29 L60 37 L56 29 Z"
+                  fill="#40eaff"
+                  opacity=".85"/>
+
+            <!-- HIGHLIGHTS -->
+
+            <path d="M53 48 L57 66"
+                  stroke="#ffffff"
+                  stroke-width="1.5"/>
+
+            <path d="M67 48 L63 66"
+                  stroke="#72edff"
+                  stroke-width="1.5"/>
+
+            <!-- WING LIGHTS -->
+
+            <circle cx="18" cy="72" r="2.5" fill="#ffffff">
+                <animate attributeName="opacity"
+                         values="1;.2;1"
+                         dur=".5s"
+                         repeatCount="indefinite"/>
+            </circle>
+
+            <circle cx="102" cy="72" r="2.5" fill="#ffffff">
+                <animate attributeName="opacity"
+                         values=".2;1;.2"
+                         dur=".5s"
+                         repeatCount="indefinite"/>
+            </circle>
+
+        </svg>
+
+    </div>
+
+    <!-- NO VERTICAL LASER ELEMENT -->
+
+    <div class="verified" id="verified">
+        ✦ LOGO SCANNED ✦
+    </div>
+
+    <!-- BLUE STATUS TEXT -->
+
+    <section class="status-box">
+
+        <div class="status-title">SHIV KE BOTZ</div>
+
+        <div class="status-subtitle" id="statusSubtitle">
+            ADVANCED FIGHTER SCANNER
+        </div>
+
+        <div id="turnstileWrap" style="display:flex;justify-content:center;margin:14px auto 0;min-height:65px;position:relative;z-index:30;">
+            <!-- Replace YOUR_CLOUDFLARE_SITE_KEY with the public Site Key from Cloudflare Turnstile. -->
+            <div class="cf-turnstile" data-sitekey="0x4AAAAAAFk4Exgng2h4rzkK" data-callback="onTurnstileSuccess" data-expired-callback="onTurnstileExpired" data-error-callback="onTurnstileError" data-theme="dark"></div>
+        </div>
+
+        <div class="status-indicator" id="statusIndicator">
+            <span class="status-dot"></span>
+            <span id="statusText">FIGHTER JET APPROACHING</span>
+        </div>
+
+    </section>
+
+    <!-- CENTERED BUTTON -->
+
+    <div class="start-wrap">
+
+        <a
+            class="start-btn"
+            id="startBot"
+            href="https://t.me/YOUR_BOT_USERNAME"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+            <span class="btn-icon">▶</span>
+            <span>START BOT</span>
+        </a>
+
+    </div>
+
+</main>
+
+<script>
+const fighter = document.getElementById("fighter");
+const logoArea = document.getElementById("logoArea");
+const verified = document.getElementById("verified");
+const statusText = document.getElementById("statusText");
+const statusSubtitle = document.getElementById("statusSubtitle");
+const statusIndicator = document.getElementById("statusIndicator");
+const startWrap = document.querySelector(".start-wrap");
+
+/*
+  Cloudflare Turnstile must be validated on your server using the SECRET KEY.
+  Never put the Turnstile secret key in this HTML file.
+  VERIFY_API_URL must point to your own backend endpoint, which calls:
+  https://challenges.cloudflare.com/turnstile/v0/siteverify
+  and enforces one-time verification server-side.
+*/
+const VERIFY_API_URL = "https://YOUR-RENDER-SERVICE.onrender.com/verify-turnstile";
+const BOT_USERNAME = "YOUR_BOT_USERNAME";
+const startBot = document.getElementById("startBot");
+startBot.href = "https://t.me/" + BOT_USERNAME;
+let turnstileToken = null;
+let verificationInProgress = false;
+
+function setStatus(text, subtitle, state = "") {
+    statusText.textContent = text;
+    statusSubtitle.textContent = subtitle;
+    statusIndicator.classList.remove("failed", "success");
+    if (state) statusIndicator.classList.add(state);
+}
+
+function showFailure(message = "VERIFICATION FAILED") {
+    startWrap.classList.remove("visible");
+    verified.classList.remove("show");
+    setStatus(message, "PLEASE TRY AGAIN OR CONTACT SUPPORT", "failed");
+}
+
+window.onTurnstileSuccess = async function(token) {
+    if (verificationInProgress) return;
+    turnstileToken = token;
+    verificationInProgress = true;
+    startWrap.classList.remove("visible");
+    setStatus("CHECKING VERIFICATION", "CONFIRMING WITH CLOUDFLARE SECURELY");
+    try {
+        if (VERIFY_API_URL.includes("YOUR_DOMAIN")) {
+            throw new Error("Configure your backend endpoint first");
+        }
+        const response = await fetch(VERIFY_API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token }),
+            cache: "no-store",
+            credentials: "same-origin"
+        });
+        if (!response.ok) throw new Error("Verification server error");
+        const result = await response.json();
+        if (result && result.verified === true && result.one_time === true) {
+            setStatus("VERIFICATION COMPLETE", "SERVER CONFIRMED · YOU CAN START THE BOT", "success");
+            verified.textContent = "✦ VERIFICATION COMPLETE ✦";
+            verified.classList.remove("show");
+            void verified.offsetWidth;
+            verified.classList.add("show");
+            document.getElementById("turnstileWrap").style.display = "none";
+            startWrap.classList.add("visible");
+        } else {
+            showFailure("VERIFICATION FAILED");
+            if (window.turnstile) window.turnstile.reset();
+        }
+    } catch (error) {
+        showFailure("VERIFICATION SERVER NOT READY");
+        if (window.turnstile) window.turnstile.reset();
+    } finally {
+        verificationInProgress = false;
+        turnstileToken = null;
+    }
+};
+
+window.onTurnstileExpired = function() {
+    turnstileToken = null;
+    startWrap.classList.remove("visible");
+    setStatus("VERIFICATION EXPIRED", "PLEASE COMPLETE THE CHECK AGAIN", "failed");
+};
+window.onTurnstileError = function() {
+    turnstileToken = null;
+    showFailure("VERIFICATION ERROR");
+};
+
+/* CREATE STARS */
+const stars = document.getElementById("stars");
+for (let i = 0; i < 65; i++) {
+    const star = document.createElement("span");
+    star.className = "star";
+    star.style.left = Math.random() * 100 + "%";
+    star.style.top = Math.random() * 100 + "%";
+    star.style.animationDelay = Math.random() * 3 + "s";
+    star.style.animationDuration = (1 + Math.random() * 3) + "s";
+    stars.appendChild(star);
+}
+
+/* The jet animation is decorative only; the server decides verification. */
+let timers = [];
+function later(callback, delay) {
+    timers.push(setTimeout(callback, delay));
+}
+
+function startScan() {
+    timers.forEach(clearTimeout);
+    timers = [];
+    fighter.classList.remove("run");
+    logoArea.classList.remove("scanning");
+    verified.classList.remove("show");
+    startWrap.classList.remove("visible");
+    setStatus("FIGHTER JET APPROACHING", "ENTERING FROM BELOW");
+
+    void fighter.offsetWidth;
+    fighter.classList.add("run");
+
+    later(() => {
+        setStatus("SCANNING LOGO", "SCAN IN PROGRESS · 8 SECONDS");
+        logoArea.classList.add("scanning");
+    }, 2860);
+
+    later(() => {
+        setStatus("COMPLETE THE SECURITY CHECK", "CLOUDFLARE MUST CONFIRM BEFORE STARTING THE BOT");
+    }, 10860);
+}
+
+startScan();
+</script>
+
+</body>
+</html>
